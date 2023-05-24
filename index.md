@@ -1,4 +1,4 @@
-Name: [103mSarvnaz[49m [44mKasaei[49m
+Name: SarvnazKasaei
 name Git version: git version 2.40.0
 npm version: 9.5.0
 Node.js version: v19.7.0
