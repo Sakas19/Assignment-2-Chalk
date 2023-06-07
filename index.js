@@ -8,6 +8,7 @@ import { formatDistanceToNow,
         isBefore, 
         set } from 'date-fns';
 import { Command } from 'commander';
+import { createHTMLFile } from './createHTML.js';
 
 const first = 'Sarvnaz';
 const last = 'Kasaei';
@@ -77,5 +78,7 @@ if (date) {
   console.log('isBefore', isBefore(dateSentAsArgument, currentDate));
 } else {
   createIndexFile();
-  writeCurrentDateTime();
+  //writeCurrentDateTime();
+  createHTMLFile();
 }
+
