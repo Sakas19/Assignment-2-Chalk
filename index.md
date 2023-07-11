@@ -1,9 +1,9 @@
 Name: [103mSarvnaz[49m [44mKasaei[49m
-name Git version: git version 2.40.0
+Git version: git version 2.40.0
 npm version: 9.5.0
 Node.js version: v19.7.0
-
-Distance to start of course: 4 months
-Is today: true
-Is after start of course: false
-Is before start of course: true
+Current date and time: 2023-07-11 10:00:02
+Distance to start of course: 5 months
+Is today: false
+Days after start of course: 161
+Days before start of course: N/A

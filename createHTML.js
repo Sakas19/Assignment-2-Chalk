@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { execSync } from 'child_process';
-import { formatDistanceToNow, isToday, isAfter, isBefore } from 'date-fns';
+import { formatDistanceToNow, isToday, differenceInDays, format } from 'date-fns';
 import chalk from 'chalk';
 
 export function createHTMLFile() {
@@ -9,17 +9,18 @@ export function createHTMLFile() {
   const nodeVersion = execSync('node --version').toString().trim();
 
   const startOfCourse = new Date(2023, 0, 31);
-  const distanceToNow = formatDistanceToNow(startOfCourse);
   const currentDate = new Date();
+  const distanceToNow = formatDistanceToNow(startOfCourse);
   const isTodayResult = isToday(currentDate);
-  const isAfterResult = isAfter(startOfCourse, currentDate);
-  const isBeforeResult = isBefore(startOfCourse, currentDate);
+  const daysDifference = differenceInDays(currentDate, startOfCourse);
+
+  const formattedCurrentDate = format(currentDate, 'yyyy-MM-dd');
 
   const first = 'Sarvnaz';
   const last = 'Kasaei';
   const name = `${chalk.bgYellowBright(first)} ${chalk.bgBlue(last)}`;
 
-const htmlContent = `
+  const htmlContent = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -27,14 +28,20 @@ const htmlContent = `
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #F6F740;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         h1 {
-            color: blue;
+            color: #995D81;
         }
 
         p {
-            color: green;
+            color: #EB8258;
         }
     </style>
 </head>
@@ -44,13 +51,18 @@ const htmlContent = `
     <p>NPM Version: ${npmVersion}</p>
     <p>Node.js Version: ${nodeVersion}</p>
     <p>Distance to start of course: ${distanceToNow}</p>
-    <p>Is today: ${isTodayResult}</p>
-    <p>Is after start of course: ${isAfterResult}</p>
-    <p>Is before start of course: ${isBeforeResult}</p>
+    <p>Is today: ${formattedCurrentDate === format(startOfCourse, 'yyyy-MM-dd')}</p>
+    <p>Days since start of course: ${daysDifference}</p>
 </body>
 </html>`;
-
 
   fs.writeFileSync('index.html', htmlContent);
   console.log(chalk.green('index.html file created successfully.'));
 }
+
+
+
+
+
+
+

@@ -1,84 +1,94 @@
-import chalk from 'chalk';
-import { execSync } from 'child_process';
 import fs from 'fs';
-import { formatDistanceToNow, 
-        parse, 
-        isToday, 
-        isAfter, 
-        isBefore, 
-        set } from 'date-fns';
-import { Command } from 'commander';
-import { createHTMLFile } from './createHTML.js';
+import { execSync } from 'child_process';
+import { formatDistanceToNow, isToday, differenceInDays } from 'date-fns';
+import chalk from 'chalk';
 
-const first = 'Sarvnaz';
-const last = 'Kasaei';
-const name = `${chalk.bgYellowBright(first)} ${chalk.bgBlue(last)}`;
+function createHTMLFile() {
+  const gitVersion = execSync('git --version').toString().trim();
+  const npmVersion = execSync('npm --version').toString().trim();
+  const nodeVersion = execSync('node --version').toString().trim();
 
-console.log('name', name);
+  const startOfCourse = new Date(2023, 0, 31);
+  const currentDate = new Date();
+  const distanceToNow = formatDistanceToNow(startOfCourse);
+  const isTodayResult = isToday(currentDate);
 
-function printMyVersions() {
-  try {
-    const gitVersion = execSync('git --version').toString().trim();
-    console.log(`Your Git version: ${gitVersion}`);
-  } catch (error) {
-    console.error(chalk.red('Git is not installed or not accessible.'));
-  }
+  // Calculate the number of days since the start of the course
+  const daysDifference = differenceInDays(currentDate, startOfCourse);
 
-  try {
-    const npmVersion = execSync('npm --version').toString().trim();
-    console.log(`Your npm version: ${npmVersion}`);
-  } catch (error) {
-    console.error(chalk.red('npm is not installed or not accessible.'));
-  }
+  const first = 'Sarvnaz';
+  const last = 'Kasaei';
+  const name = `${chalk.bgYellowBright(first)} ${chalk.bgBlue(last)}`;
+  const plainName = `${first} ${last}`;
 
-  try {
-    const nodeVersion = execSync('node --version').toString().trim();
-    console.log(`Your Node.js version: ${nodeVersion}`);
-  } catch (error) {
-    console.error(chalk.red('Node.js is not installed or not accessible.'));
-  }
+  // Write to the console with chalk
+  console.log(chalk.bold('Console Output:'));
+  console.log(chalk.yellow('Name:'), name);
+  console.log(chalk.green('Git Version:'), gitVersion);
+  console.log(chalk.green('NPM Version:'), npmVersion);
+  console.log(chalk.green('Node.js Version:'), nodeVersion);
+  console.log(chalk.green('Distance to start of course:'), distanceToNow);
+  console.log(chalk.green('Is today:'), isTodayResult);
+  console.log(chalk.green('Days since start of course:'), daysDifference);
+  console.log();
+
+  const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Index Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F6F740;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h1 {
+            color: #995D81;
+        }
+
+        p {
+            color: #EB8258;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Name: ${plainName}</h1>
+        <p>Git Version: ${gitVersion}</p>
+        <p>NPM Version: ${npmVersion}</p>
+        <p>Node.js Version: ${nodeVersion}</p>
+        <p>Distance to start of course: ${distanceToNow}</p>
+        <p>Is today: ${isTodayResult}</p>
+        <p>Days since start of course: ${daysDifference}</p>
+    </div>
+</body>
+</html>`;
+
+  fs.writeFileSync('index.html', htmlContent);
+  console.log(chalk.green('index.html file created successfully.'));
 }
 
-printMyVersions();
+createHTMLFile();
 
-function createIndexFile() {
-  try {
-    const gitVersion = execSync('git --version').toString().trim();
-    const npmVersion = execSync('npm --version').toString().trim();
-    const nodeVersion = execSync('node --version').toString().trim();
 
-    const startOfCourse = new Date(2023, 0, 31);
-    const distanceToNow = formatDistanceToNow(startOfCourse);
-    const currentDate = new Date();
-    const isTodayResult = isToday(currentDate);
-    const isAfterResult = isAfter(startOfCourse, currentDate);
-    const isBeforeResult = isBefore(startOfCourse, currentDate);
 
-    const content = `Name: ${name}\nname Git version: ${gitVersion}\nnpm version: ${npmVersion}\nNode.js version: ${nodeVersion}\n\nDistance to start of course: ${distanceToNow}\nIs today: ${isTodayResult}\nIs after start of course: ${isAfterResult}\nIs before start of course: ${isBeforeResult}`;
 
-    fs.writeFileSync('index.md', content);
-    console.log(chalk.green('index.md file created successfully.'));
-  } catch (error) {
-    console.error(chalk.red('Error creating index.md file:', error));
-  }
-}
 
-const argumentParser = new Command();
-argumentParser.option('--date <date>', '2023, 0, 31');
-argumentParser.parse(process.argv);
 
-const { date } = argumentParser;
 
-if (date) {
-  const dateSentAsArgument = parse(date, 'yyyy-MM-dd', new Date(2023, 1, 11));
-  const currentDate = set(new Date(), { hours: 0, minutes: 0, seconds: 0, milliseconds: 0 });
 
-  console.log('isToday', isToday(dateSentAsArgument));
-  console.log('isAfter', isAfter(dateSentAsArgument, currentDate));
-  console.log('isBefore', isBefore(dateSentAsArgument, currentDate));
-} else {
-  createIndexFile();
-  //writeCurrentDateTime();
-  createHTMLFile();
-}
 
