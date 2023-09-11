@@ -1,19 +1,30 @@
 import fs from 'fs';
 import { execSync } from 'child_process';
-import { formatDistanceToNow, isToday, differenceInDays } from 'date-fns';
+import { formatDistanceToNow, isToday, parse, set, differenceInDays } from 'date-fns';
 import chalk from 'chalk';
+import { Command } from 'commander';
 
-function createHTMLFile() {
+const argumentParser = new Command();
+argumentParser.option('--date')
+argumentParser.parse();
+
+argumentParser
+  .option('-d, --date <date>', 'Specify a custom date (format: yyyy-mm-dd)')
+  .parse(process.argv);
+
+function getVersionInfo() {
   const gitVersion = execSync('git --version').toString().trim();
   const npmVersion = execSync('npm --version').toString().trim();
   const nodeVersion = execSync('node --version').toString().trim();
 
-  const startOfCourse = new Date(2023, 0, 31);
-  const currentDate = new Date();
+  return { gitVersion, npmVersion, nodeVersion };
+}
+
+function createHTMLFile(startOfCourse, currentDate) {
+  const { gitVersion, npmVersion, nodeVersion } = getVersionInfo();
+
   const distanceToNow = formatDistanceToNow(startOfCourse);
   const isTodayResult = isToday(currentDate);
-
-  // Calculate the number of days since the start of the course
   const daysDifference = differenceInDays(currentDate, startOfCourse);
 
   const first = 'Sarvnaz';
@@ -21,7 +32,6 @@ function createHTMLFile() {
   const name = `${chalk.bgYellowBright(first)} ${chalk.bgBlue(last)}`;
   const plainName = `${first} ${last}`;
 
-  // Write to the console with chalk
   console.log(chalk.bold('Console Output:'));
   console.log(chalk.yellow('Name:'), name);
   console.log(chalk.green('Git Version:'), gitVersion);
@@ -33,11 +43,11 @@ function createHTMLFile() {
   console.log();
 
   const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Index Page</title>
-    <style>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Index Page</title>
+        <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #F6F740;
@@ -63,32 +73,39 @@ function createHTMLFile() {
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Name: ${plainName}</h1>
-        <p>Git Version: ${gitVersion}</p>
-        <p>NPM Version: ${npmVersion}</p>
-        <p>Node.js Version: ${nodeVersion}</p>
-        <p>Distance to start of course: ${distanceToNow}</p>
-        <p>Is today: ${isTodayResult}</p>
-        <p>Days since start of course: ${daysDifference}</p>
-    </div>
-</body>
-</html>`;
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Name: ${plainName}</h1>
+            <p>Git Version: ${gitVersion}</p>
+            <p>NPM Version: ${npmVersion}</p>
+            <p>Node.js Version: ${nodeVersion}</p>
+            <p>Distance to start of course: ${distanceToNow}</p>
+            <p>Is today: ${isTodayResult}</p>
+            <p>Days since start of course: ${daysDifference}</p>
+        </div>
+    </body>
+    </html>`;
 
   fs.writeFileSync('index.html', htmlContent);
   console.log(chalk.green('index.html file created successfully.'));
 }
 
-createHTMLFile();
+const dateStringSentAsArgument = argumentParser.date || argumentParser.args[0]; 
+
+if (!dateStringSentAsArgument) {
+  console.error('Error: Please provide a date as a command-line argument (format: yyyy-mm-dd)');
+  process.exit(1);
+}
+
+const dateSentAsArgument = parse(dateStringSentAsArgument, 'yyyy-MM-dd', new Date());
+const currentDate = set(new Date(), { hours: 0, minutes: 0, seconds: 0, milliseconds: 0 });
+
+createHTMLFile(dateSentAsArgument, currentDate);
 
 
 
-
-
-
-
+  
 
 
